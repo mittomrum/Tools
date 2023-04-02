@@ -48,6 +48,9 @@ namespace tomrum
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }
+        public static void InstallUnityPackage(string packageName){
+            UnityEditor.PackageManager.Client.Add($"com.unity.{packageName}");
+        }
     }
 
     public static class ToolsMenu
@@ -64,5 +67,15 @@ namespace tomrum
         {
             await Packages.ReplacePackagesFromGist("54769e89109842169d88029fea3714e1");
         }
+
+        [MenuItem("Tools/Setup/Packages/New Input System")]
+        static void AddNewInputSystem() => Packages.InstallUnityPackage("inputsystem");
+
+        [MenuItem("Tools/Setup/Packages/ProBuilder")]
+        static void AddNewInputSystem() => Packages.InstallUnityPackage("ProBuilder");
+
+        [MenuItem("Tools/Setup/Packages/Cinemachine")]
+        static void AddNewInputSystem() => Packages.InstallUnityPackage("Cinemachine");
+        
     }
 }
