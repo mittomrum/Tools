@@ -10,48 +10,59 @@ using System.Net.Http;
 
 namespace tomrum
 {
-    public static class ToolsMenu
+
+    public static class Folders
     {
-        [MenuItem("Tools/Setup/Initial Project Folders")]
-        public static void CreateDefaultFolders()
+        public static void CreateDirectories(string root, params string[] dir)
         {
-            CreateDirectories("_Project", "Scripts", "Art", "Scenes");
-            Refresh();
+            foreach (var newDirectory in dir)
+            {
+                CreateDirectory(Combine(dataPath, root, newDirectory));
+            }
         }
-        [MenuItem("Tools/Setup/Load Manifest")]
-        static async void LoadNewManifest()
+    }
+
+    public static class Packages
+    {
+        public static async Task ReplacePackagesFromGist(string id, string user = "mittomrum")
         {
-            var url = GetGistUrl("54769e89109842169d88029fea3714e1");
+            var url = GetGistUrl(id, user);
             var contents = await GetContents(url);
             ReplacePackageFile(contents);
         }
 
-        //
-
-        public static void CreateDirectories(string root, params string[] dir)
+        private static void ReplacePackageFile(string contents)
         {
-            var fullPath = Combine(dataPath, root);
-            foreach (var newDirectory in dir)
-            {
-                CreateDirectory(Combine(fullPath, newDirectory));
-            }
+            var existing = Path.Combine(Application.dataPath, "../Packages/manifest.json");
+            File.WriteAllText(existing, contents);
+            UnityEditor.PackageManager.Client.Resolve();
         }
 
-        static string GetGistUrl(string id, string user = "mittomrum") =>
+        private static string GetGistUrl(string id, string user) =>
             $"https://gist.github.com/{user}/{id}/raw";
 
-        static async Task<string> GetContents(string url)
+        private static async Task<string> GetContents(string url)
         {
             using var client = new HttpClient();
             var response = await client.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }
-        static void ReplacePackageFile(string contents)
+    }
+
+    public static class ToolsMenu
+    {
+        [MenuItem("Tools/Setup/Initial Project Folders")]
+        static void CreateDefaultFolders()
         {
-            var existing = Path.Combine(Application.dataPath, "../Packages/manifest.json");
-            File.WriteAllText(existing, contents);
-            UnityEditor.PackageManager.Client.Resolve();
+            Folders.CreateDirectories("_Project", "Scripts", "Art", "Scenes");
+            Refresh();
+        }
+
+        [MenuItem("Tools/Setup/Load Manifest")]
+        static async void LoadNewManifest()
+        {
+            await Packages.ReplacePackagesFromGist("54769e89109842169d88029fea3714e1");
         }
     }
 }
