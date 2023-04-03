@@ -53,6 +53,32 @@ namespace tomrum
             UnityEditor.PackageManager.Client.Add($"com.unity.{packageName}");
         }
     }
+    public static class ScriptGenerator
+    {
+        public static async Task ReplaceScriptFile(string id, string user = "mittomrum")
+        {
+            var url = GetGistUrl(id, user);
+            var contents = await GetContents(url);
+            ReplacePackageFile(contents);
+        }
+
+        private static void ReplacePackageFile(string contents)
+        {
+            var existing = Path.Combine(Application.dataPath, "../Assets/_Project/Scripts/Movement");
+            File.WriteAllText(existing, contents);
+        }
+
+        private static string GetGistUrl(string id, string user) =>
+            $"https://gist.github.com/{user}/{id}/raw";
+
+        private static async Task<string> GetContents(string url)
+        {
+            using var client = new HttpClient();
+            var response = await client.GetAsync(url);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
+        }
+    }
 
     public static class ToolsMenu
     {
@@ -61,6 +87,12 @@ namespace tomrum
         {
             Folders.CreateDirectories("_Project", "Scripts", "Art", "Scenes");
             Refresh();
+        }
+        [MenuItem("Tools/Setup/Initial Scripts (Movement)")]
+        static async void LoadNewScripts()
+        {
+            await ScriptGenerator.ReplaceScriptFile("169f3da32129a3506c5d7a1e2dc6d072");
+            Debug.Log("Done Loading");
         }
 
         [MenuItem("Tools/Setup/Load Manifest")]
