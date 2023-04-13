@@ -7,6 +7,8 @@ using static UnityEngine.Application;
 using static UnityEditor.AssetDatabase;
 using System.Threading.Tasks;
 using System.Net.Http;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace tomrum
 {
@@ -85,9 +87,53 @@ namespace tomrum
         [MenuItem("Tools/Setup/Initial Project Folders")]
         static void CreateDefaultFolders()
         {
-            Folders.CreateDirectories("_Project", "Scripts", "Art", "Scenes");
+            Folders.CreateDirectories("_Project", "Scenes", "Prefabs", "Canvas");
+            Folders.CreateDirectories("_Project/_Scripts/", "Scriptables", "Systems", "Managers");
+            Folders.CreateDirectories("_Project/Resources/Art", "Sprites", "Materials");
+            Folders.CreateDirectories("_Project/Resources/Audio");
+
             Refresh();
         }
+
+        [MenuItem("Tools/Setup/Initial Project Stucture (Inspector)")]
+        [System.Obsolete]
+        static void Create()
+        {
+            GameObject managers = new GameObject("Managers");
+            GameObject exampleUnityManager = new GameObject("Example UnityManager");
+            exampleUnityManager.transform.SetParent(managers.transform, false);
+            GameObject exampleGameManager = new GameObject("Example GameManager");
+            exampleGameManager.transform.SetParent(managers.transform, false);
+
+            GameObject setup = new GameObject("Setup");
+            GameObject mainCamera = new GameObject("Main Camera");
+            mainCamera.AddComponent<Camera>();
+            GameObject directionalLight = new GameObject("Directional Light");
+            directionalLight.AddComponent<Light>();
+            GameObject eventSystem = new GameObject("EventSystem");
+            eventSystem.AddComponent<EventSystem>();
+            eventSystem.AddComponent<StandaloneInputModule>();
+            setup.transform.SetParent(managers.transform, false);
+
+            GameObject environment = new GameObject("Environment");
+            GameObject exampleUnits = new GameObject("Example Units");
+            exampleUnits.transform.SetParent(environment.transform, false);
+
+            GameObject canvases = new GameObject("Canvases");
+            GameObject mainCanvas = new GameObject("Main Canvas");
+            mainCanvas.AddComponent<Canvas>();
+            mainCanvas.AddComponent<CanvasScaler>();
+            mainCanvas.AddComponent<GraphicRaycaster>();
+            mainCanvas.transform.SetParent(canvases.transform, false);
+
+            GameObject systems = new GameObject("Systems");
+            GameObject audioSystem = new GameObject("Audio System");
+            audioSystem.transform.SetParent(systems.transform, false);
+            GameObject resourceSystem = new GameObject("Resource System");
+            resourceSystem.transform.SetParent(systems.transform, false);
+        }
+
+
         [MenuItem("Tools/Setup/Initial Scripts (Movement)")]
         static async void LoadNewScripts()
         {
